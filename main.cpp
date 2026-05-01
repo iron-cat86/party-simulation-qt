@@ -4,7 +4,8 @@
 #include "mainwindow.h"
 #include "simulation.h"
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
     QApplication a(argc, argv);
     QString iconPath = ":/icon.png";
     QString imagePath = ":/splash.png";
@@ -53,30 +54,25 @@ int main(int argc, char *argv[]) {
     splash.raise();
     a.processEvents();
     QTime dieTime = QTime::currentTime().addSecs(2);
-        while (QTime::currentTime() < dieTime) {
-            a.processEvents(QEventLoop::AllEvents, 100);
-        }
-    // 1. Создаем поток-"двигатель"
+
+    while (QTime::currentTime() < dieTime)
+    {
+        a.processEvents(QEventLoop::AllEvents, 100);
+    }
+
     QThread* simThread = new QThread();
-
-    // 2. Создаем объект логики (Воркер).
     ConferenceSimulation *sim = new ConferenceSimulation(20, 1000);
-
-    // 3. Теперь вся логика sim будет жить в simThread
     sim->moveToThread(simThread);
 
-    // 4. КОННЕКТЫ УПРАВЛЕНИЯ
     QObject::connect(simThread, &QThread::started, sim, &ConferenceSimulation::process);
 
-    // Когда симуляция сигналит об окончании — поток должен остановиться
     QObject::connect(sim, &ConferenceSimulation::simulationEnded, simThread, &QThread::quit);
 
-    // 5. Создаем окно и передаем ему симуляцию
     MainWindow w(sim);
-    w.setWindowTitle("Conference Party - SUE Moscow Metro R&D");
+    w.setWindowTitle("Conference Party");
     w.show();
     splash.finish(&w);
-    // 6. ЗАПУСК
+
     simThread->start();
 
     return a.exec();
