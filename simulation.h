@@ -66,6 +66,7 @@ private:
 
     std::mt19937 gen{std::random_device{}()};
     int m_interval;
+    int iterationCount = 0;
     std::atomic<bool> isRun; // Атомарный флаг для безопасности
     QString logString;
     mutable QMutex dataMutex;

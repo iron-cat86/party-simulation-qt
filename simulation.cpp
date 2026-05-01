@@ -31,6 +31,7 @@ void ConferenceSimulation::process()
     {
         nextStep();
         QThread::msleep(m_interval);
+        ++iterationCount;
     }
     emit finished();
 }
@@ -41,7 +42,7 @@ void ConferenceSimulation::nextStep()
 
     if (roomA.size() < 2)
     {
-        buildLogString("Симуляция окончена (недостаточно людей)!");
+        buildLogString(QString("[Итерация %1]: Симуляция окончена (недостаточно людей)!").arg(iterationCount));
         isRun = false;
         emit simulationEnded();
         return;
@@ -64,7 +65,7 @@ void ConferenceSimulation::nextStep()
 
         if(!hasPotentialMatch)
         {
-            buildLogString("Симуляция окончена (пар больше нет)!");
+            buildLogString(QString("[Итерация %1]: Симуляция окончена (пар больше нет)").arg(iterationCount));
             isRun = false;
             emit simulationEnded();
             return;
@@ -83,7 +84,8 @@ void ConferenceSimulation::nextStep()
     Person& p1 = roomA[idx1];
     Person& p2 = roomA[idx2];
 
-    QString log = QString("Участник %1 с интересом %2 встретил %3 с интересом %4\n")
+    QString log = QString("[Итерация %1]: Участник %2 с интересом %3 встретил %4 с интересом %5\n")
+        .arg(iterationCount)
         .arg(p1.id).arg(p1.getInterestStr())
         .arg(p2.id).arg(p2.getInterestStr());
 
@@ -170,5 +172,6 @@ QString ConferenceSimulation::getFinalStateReport() const
     QString report = "===== ИТОГОВЫЙ ОТЧЕТ =====\n\n";
     report += QString("ЗАЛ А (Остались): %1 чел.\n").arg(roomA.size()) + countInterests(roomA);
     report += QString("\nЗАЛ Б (Пары): %1\n").arg(roomB.size() / 2) + countInterests(roomB);
+    report += QString("Всего итераций %1\n").arg(iterationCount);
     return report;
 }
