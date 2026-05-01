@@ -11,6 +11,7 @@
 #include <QTextEdit>
 #include <QDialog>
 #include <QDebug>
+#include <QMenuBar>
 #include <random>
 
 MainWindow::MainWindow(ConferenceSimulation *sim)
@@ -28,6 +29,32 @@ MainWindow::MainWindow(ConferenceSimulation *sim)
 
     connect(m_sim, &ConferenceSimulation::simulationEnded, this, [this]() {
         QMessageBox::information(this, "Конец симуляции", "Подходящих пар в зале А больше нет!");
+    });
+
+    helpMenu = menuBar()->addMenu("Help");
+
+    aboutAction = new QAction("About Application", this);
+    helpMenu->addAction(aboutAction);
+
+    connect(aboutAction, &QAction::triggered, [this]() {
+        QMessageBox aboutBox(this);
+        aboutBox.setWindowTitle("О программе");
+
+        // Тот самый текст "кто, нахуя и как с этим жить"
+        QString info = "<b>Conference Party Simulator</b><br><br>"
+                       "<b>Автор:</b> Анна Белова (Lead Systems Programmer)<br>"
+                       "<b>Назначение:</b> Моделирование социальных взаимодействий на базе Qt/C++.<br><br>"
+                       "<b>Что симулирует:</b> Участники с разными интересами пытаются найти пару. "
+                       "Если интересы совпадают (Epidemiology, Statistics и др.), они уходят в Lounge (Зал Б).<br><br>"
+                       "<b>Использование:</b> Наблюдайте за анимацией, пользуйтесь поиском по ID, журналом событий "
+                       "и не забывайте проверять итоговый отчет в любое время. Вечеринка должна продолжаться!";
+
+        aboutBox.setTextFormat(Qt::RichText);
+        aboutBox.setText(info);
+        aboutBox.setStandardButtons(QMessageBox::Ok);
+        aboutBox.setIcon(QMessageBox::Information);
+
+        aboutBox.exec();
     });
 }
 

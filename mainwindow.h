@@ -33,6 +33,9 @@ private:
     QPushButton *findButton;
     QPushButton *logButton;
     QPushButton *finalReportButton;
+
+    QMenu *helpMenu;
+    QAction *aboutAction;
 };
 
 #endif // MAINWINDOW_H
