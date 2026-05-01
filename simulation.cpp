@@ -2,8 +2,9 @@
 #include <iostream>
 
 ConferenceSimulation::ConferenceSimulation(int n, int intervalMs):
-    m_interval(intervalMs) 
+    m_interval(intervalMs)
 {
+    this->setParent(nullptr);
     std::uniform_int_distribution<> dist(0, 3);
     for (int i = 1; i <= n; ++i) {
         roomA.push_back({i, static_cast<Interest>(dist(gen)), "A"});
@@ -13,24 +14,20 @@ ConferenceSimulation::ConferenceSimulation(int n, int intervalMs):
 ConferenceSimulation::~ConferenceSimulation()
 {
     stop();
+    quit();
+    wait();
 }
 
 void ConferenceSimulation::stop()
 {
-    buildLogString("Симуляция окончена!");
     isRun = false;
-    while(this->isRunning())
-        sleep(1);
 }
 
 void ConferenceSimulation::run() 
 {
     isRun = true;
-    while (isRun) {
-        if (roomA.size() < 2) {
-            emit simulationEnded();
-            return;
-        }
+    while (isRun)
+    {
         nextStep();
         msleep(m_interval);
     }
@@ -40,6 +37,7 @@ void ConferenceSimulation::nextStep()
 {
     // 1. Проверка: есть ли кого выбирать
     if (roomA.size() < 2) {
+        buildLogString("Симуляция окончена!");
         emit simulationEnded();
         return;
     }
@@ -58,6 +56,7 @@ void ConferenceSimulation::nextStep()
         }
 
         if(!hasPotentialMatch) {
+            buildLogString("Симуляция окончена!");
             emit simulationEnded();
             return;
         }
@@ -154,4 +153,35 @@ void ConferenceSimulation::buildLogString(QString curLog)
     logString += ": ";
     logString += curLog;
     logString += "\n";
+}
+
+QString ConferenceSimulation::getFinalStateReport() const {
+    // Лямбда для подсчета интересов в конкретном списке
+    auto countInterests = [](const std::vector<Person>& people) {
+        std::map<Interest, int> counts;
+        for (const auto& p : people) {
+            counts[p.interest]++;
+        }
+
+        QString detail;
+        detail += QString("- Эпидемиология: %1\n").arg(counts[Interest::EPIDEMIOLOGY]);
+        detail += QString("- Статистика: %1\n").arg(counts[Interest::STATISTICS]);
+        detail += QString("- Клин. исследования: %1\n").arg(counts[Interest::CLINICAL_TRIALS]);
+        detail += QString("- Политика здравоохр.: %1\n").arg(counts[Interest::HEALTH_POLICY]);
+        return detail;
+    };
+
+    QString report = "===== ИТОГОВЫЙ ОТЧЕТ СИМУЛЯЦИИ =====\n\n";
+
+    report += QString("ЗАЛ А (Остались без пары: %1 чел.)\n").arg(roomA.size());
+    report += countInterests(roomA);
+
+    report += "\n------------------------------------\n";
+
+    report += QString("ЗАЛ Б (Сформировано пар: %1)\n").arg(roomB.size() / 2);
+    report += countInterests(roomB);
+
+    report += "\n====================================";
+
+    return report;
 }

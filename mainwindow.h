@@ -10,6 +10,7 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 public:
     MainWindow(ConferenceSimulation *sim);
+    ~MainWindow();
 private:
     void setupScene();
     void setupButton();
@@ -25,4 +26,5 @@ private:
     QLineEdit *idInput;
     QPushButton *findButton;
     QPushButton *logButton;
+    QPushButton *finalReportButton;
 };

@@ -7,7 +7,6 @@ int main(int argc, char *argv[]) {
 
     // 1. Создаем симуляцию на 20 человек
     ConferenceSimulation *sim = new ConferenceSimulation(20, 1000);
-    QObject::connect(sim, &ConferenceSimulation::finished, sim, &QObject::deleteLater);
     // 2. Создаем окно и передаем ему симуляцию для отрисовки
     MainWindow w(sim);
     w.setWindowTitle("Conference Party - Команда №5");

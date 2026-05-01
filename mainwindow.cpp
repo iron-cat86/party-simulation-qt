@@ -30,6 +30,15 @@ MainWindow::MainWindow(ConferenceSimulation *sim)
     });
 }
 
+MainWindow::~MainWindow()
+{
+    if (m_sim) {
+        m_sim->requestInterruption(); // Просим поток выйти из цикла
+        m_sim->wait();                // ЖДЕМ (это критично!), пока он реально умрет
+        delete m_sim;                 // Теперь удаляем безопасно
+    }
+}
+
 void MainWindow::setupButton()
 {
     QWidget *controls = new QWidget(this);
@@ -80,20 +89,47 @@ void MainWindow::setupButton()
     layout->addWidget(logButton);
 
     connect(logButton, &QPushButton::clicked, [this]() {
+        if (!m_sim) return;
+        QDialog *logDialog = new QDialog(this);
+            logDialog->setWindowTitle("ЖУРНАЛ СОБЫТИЙ");
+            logDialog->resize(600, 400);
+
+            QVBoxLayout *layout = new QVBoxLayout(logDialog);
+            QTextEdit *textEdit = new QTextEdit(logDialog);
+
+            // Получаем текст ДО того, как диалог начнет жить своей жизнью
+            QString history = m_sim->getHistoryLog();
+            textEdit->setPlainText(history);
+            textEdit->setReadOnly(true);
+
+            QPushButton *closeBtn = new QPushButton("Закрыть", logDialog);
+            connect(closeBtn, &QPushButton::clicked, logDialog, &QDialog::accept);
+
+            layout->addWidget(textEdit);
+            layout->addWidget(closeBtn);
+
+            logDialog->exec();
+            // НЕ ИСПОЛЬЗУЙ deleteLater() здесь, если есть сомнения в потоках
+            delete logDialog;
+    });
+
+    finalReportButton = new QPushButton("Итоговый отчет", this);
+    layout->addWidget(finalReportButton);
+
+    connect(finalReportButton, &QPushButton::clicked, [this]() {
+        // Вызываем нашу новую функцию статистики
+        m_sim->blockSignals(true);
+        QString finalReport = m_sim->getFinalStateReport();
+         m_sim->blockSignals(false);
         QMessageBox msgBox(this);
-        msgBox.setWindowTitle("Журнал взаимодействий");
-        msgBox.setText("Полная история встреч:");
-
-        // Создаем поле с текстом и прокруткой
-        QTextEdit *scrollViewer = new QTextEdit(&msgBox);
-        scrollViewer->setPlainText(m_sim->getLog());
-        scrollViewer->setReadOnly(true); // Только чтение
-        scrollViewer->setFixedSize(400, 300); // Задаем комфортный размер
-
-        // Добавляем этот виджет прямо в структуру MessageBox
-        msgBox.layout()->addWidget(scrollViewer);
-
+        msgBox.setWindowTitle("Результаты конференции");
+        msgBox.setText("Распределение участников по залам:");
+        msgBox.setInformativeText(finalReport);
         msgBox.setStandardButtons(QMessageBox::Ok);
+
+        // Сделаем иконку информационной для солидности
+        msgBox.setIcon(QMessageBox::Information);
+
         msgBox.exec();
     });
 }

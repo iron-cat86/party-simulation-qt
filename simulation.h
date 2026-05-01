@@ -13,7 +13,7 @@
 #include <random>
 #include <chrono>
 #include <iomanip>
-
+static std::atomic<bool> isRun{false};
 enum class Interest { EPIDEMIOLOGY, STATISTICS, CLINICAL_TRIALS, HEALTH_POLICY };
 
 struct Person 
@@ -41,7 +41,8 @@ public:
     const std::vector<Person>& getRoomB() const { return roomB; }
     void stop();
     QString findPersonById(int id) const;
-    const QString getLog() const {return logString;}
+    QString getFinalStateReport() const;
+    const QString getHistoryLog() const {return logString;}
 private:
     void printState(QString log) const;
     void display(const Person& p) const;
@@ -61,7 +62,6 @@ private:
     std::vector<Person> roomA;
     std::vector<Person> roomB;
     std::mt19937 gen{std::random_device{}()};
-    bool isRun=true;
     QString logString;
 };
 #endif
