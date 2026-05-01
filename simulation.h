@@ -5,6 +5,10 @@
 #include <QTimer>
 #include <QThread>
 #include <QString>
+#include <QDateTime>
+#include <QDebug>
+#include <QMutex>
+#include <QMutexLocker>
 #include <vector>
 #include <random>
 #include <chrono>
@@ -16,10 +20,12 @@ struct Person
 {
     int id;
     Interest interest;
-    std::string room = "A";
+    QString room = "A";
 
-    std::string getInterestStr() const {
-        static const std::string names[] = { "Epidemiology", "Statistics", "Clinical Trials", "Health Policy" };
+    QString getInterestStr() const {
+        static const QString names[] =
+        {"эпидемиология", "статистика", "клинические исследования", "политика в области здравоохранения"};
+        //"Epidemiology", "Statistics", "Clinical Trials", "Health Policy" };
         return names[static_cast<int>(interest)];
     }
 };
@@ -30,13 +36,17 @@ class ConferenceSimulation: public QThread
 public:
     explicit ConferenceSimulation(int n, int intervalMs);
     ~ConferenceSimulation();
-    
-    void printState() const;
-    QString findPersonById(int id) const;
-    void display(const Person& p) const;
-    void stop(){isRunning = false;}
+
     const std::vector<Person>& getRoomA() const { return roomA; }
     const std::vector<Person>& getRoomB() const { return roomB; }
+    void stop();
+    QString findPersonById(int id) const;
+    const QString getLog() const {return logString;}
+private:
+    void printState(QString log) const;
+    void display(const Person& p) const;
+    void buildLogString(QString curLog);
+    QString getCurrentTimestamp() const;
 protected:
     void run() override;
 public slots:
@@ -46,10 +56,12 @@ signals:
     void simulationEnded();
 
 private:
+    mutable QMutex dataMutex;
     int m_interval;
     std::vector<Person> roomA;
     std::vector<Person> roomB;
     std::mt19937 gen{std::random_device{}()};
-    bool isRunning=true;
+    bool isRun=true;
+    QString logString;
 };
 #endif

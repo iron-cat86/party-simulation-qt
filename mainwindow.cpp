@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include <QVariantAnimation>
 #include <QHBoxLayout>
+#include <QTextEdit>
 #include <iostream>
 
 MainWindow::MainWindow(ConferenceSimulation *sim)
@@ -23,7 +24,7 @@ MainWindow::MainWindow(ConferenceSimulation *sim)
     // Соединяем логику с графикой
     connect(m_sim, &ConferenceSimulation::interactionOccurred, this, &MainWindow::onInteraction);
     connect(m_sim, &ConferenceSimulation::simulationEnded, [this]() {
-        std::cout << "Simulation over. Thread stopping..."<<std::endl;
+        qDebug() << "Simulation over. Thread stopping...";
         QMessageBox::information(this, "Finish", "Подходящих пар больше нет!");
         m_sim->stop();
     });
@@ -73,6 +74,27 @@ void MainWindow::setupButton()
                 QMessageBox::critical(this, "Не найден",
                     QString("Участник с ID %1 не найден в списках конференции.").arg(id));
             }
+    });
+
+    logButton = new QPushButton("Лог событий", this);
+    layout->addWidget(logButton);
+
+    connect(logButton, &QPushButton::clicked, [this]() {
+        QMessageBox msgBox(this);
+        msgBox.setWindowTitle("Журнал взаимодействий");
+        msgBox.setText("Полная история встреч:");
+
+        // Создаем поле с текстом и прокруткой
+        QTextEdit *scrollViewer = new QTextEdit(&msgBox);
+        scrollViewer->setPlainText(m_sim->getLog());
+        scrollViewer->setReadOnly(true); // Только чтение
+        scrollViewer->setFixedSize(400, 300); // Задаем комфортный размер
+
+        // Добавляем этот виджет прямо в структуру MessageBox
+        msgBox.layout()->addWidget(scrollViewer);
+
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.exec();
     });
 }
 void MainWindow::setupScene()

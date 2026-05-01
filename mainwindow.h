@@ -24,5 +24,5 @@ private:
     std::map<int, QGraphicsEllipseItem*> items; // Быстрый доступ к кружку по ID
     QLineEdit *idInput;
     QPushButton *findButton;
-
+    QPushButton *logButton;
 };

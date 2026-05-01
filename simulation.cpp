@@ -12,14 +12,21 @@ ConferenceSimulation::ConferenceSimulation(int n, int intervalMs):
 
 ConferenceSimulation::~ConferenceSimulation()
 {
-    isRunning = false;
-    wait();
+    stop();
+}
+
+void ConferenceSimulation::stop()
+{
+    buildLogString("Симуляция окончена!");
+    isRun = false;
+    while(this->isRunning())
+        sleep(1);
 }
 
 void ConferenceSimulation::run() 
 {
-    isRunning = true;
-    while (isRunning) {
+    isRun = true;
+    while (isRun) {
         if (roomA.size() < 2) {
             emit simulationEnded();
             return;
@@ -62,12 +69,15 @@ void ConferenceSimulation::nextStep()
     do { 
         idx2 = select(gen); 
     } while (idx1 == idx2);
+    QString log = QString("Участник %1 подходит к участнику %2\n").arg(idx1).arg(idx2);
 
     // Достаем ссылки для сравнения
     Person& p1 = roomA[idx1];
     display(p1);
     Person& p2 = roomA[idx2];
     display(p2);
+    log += QString("Интересы: %1 и %2 соответственно\n").arg(p1.getInterestStr())
+                                                        .arg(p2.getInterestStr());
 
     bool isMatch = (p1.interest == p2.interest);
 
@@ -87,39 +97,61 @@ void ConferenceSimulation::nextStep()
         if (idx1 < idx2) std::swap(idx1, idx2);
         roomA.erase(roomA.begin() + idx1);
         roomA.erase(roomA.begin() + idx2);
+        log += "Интересы совпали, уходят в гостинную\n";
     }
-    printState();
+    else
+        log += "Интересы не совпали\n";
+    log += QString("В комнате А %1 участников, в комнате Б %2 участников\n").arg(roomA.size()).arg(roomB.size());
+    printState(log);
+    buildLogString(log);
     // Если не совпали — ничего не делаем, они просто остаются в roomA
 }
 
 
-void ConferenceSimulation::printState() const 
+void ConferenceSimulation::printState(QString log) const
 {
-    std::cout << "Состояние: [Комната А: " << roomA.size() << " чел.] "
-              << "[Комната Б: " << roomB.size() << " чел.]\n\n";
+    QMutexLocker locker(&dataMutex);
+    qDebug()<<log;
 }
 
 QString ConferenceSimulation::findPersonById(int id) const
 {
+    QMutexLocker locker(&dataMutex);
     // Ищем в комнате А
     for (const auto& p : roomA) {
         if (p.id == id) {
             return QString("ID: %1\nИнтерес: %2\nЛокация: Зал А")
-                .arg(p.id).arg(QString::fromStdString(p.getInterestStr()));
+                .arg(p.id).arg(p.getInterestStr());
         }
     }
     // Ищем в комнате Б
     for (const auto& p : roomB) {
         if (p.id == id) {
             return QString("ID: %1\nИнтерес: %2\nЛокация: Зал Б (Уже в паре!)")
-                .arg(p.id).arg(QString::fromStdString(p.getInterestStr()));
+                .arg(p.id).arg(p.getInterestStr());
         }
     }
-    return QString(""); // Не нашли
+    return QString("Не нашли");
 }
 
 void ConferenceSimulation::display(const Person& p) const 
 {
-    std::cout << ">>> Результат поиска: ID " << p.id << " | Интерес: " 
-              << p.getInterestStr() << " | Локация: Комната " << p.room << std::endl;
+    QMutexLocker locker(&dataMutex);
+    qDebug() << ">>> Результат поиска: ID " << p.id << " | Интерес: "
+             << p.getInterestStr() << " | Локация: Комната " << p.room;
+}
+
+QString ConferenceSimulation::getCurrentTimestamp() const
+{
+    // Формат: День.Месяц.Год Часы:Минуты:Секунды
+    return QDateTime::currentDateTime().toString("dd.MM.yyyy HH:mm:ss");
+}
+
+void ConferenceSimulation::buildLogString(QString curLog)
+{
+    QMutexLocker locker(&dataMutex);
+    logString += getCurrentTimestamp();
+    logString += ": ";
+    logString += curLog;
+    logString += "\n";
 }
