@@ -1,6 +1,10 @@
-#include <QGraphicsScene>
-#include <QGraphicsEllipseItem>
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
 #include <QMainWindow>
+#include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QGraphicsEllipseItem>
 #include <QLineEdit>
 #include <QPushButton>
 #include <map>
@@ -9,22 +13,27 @@
 class MainWindow : public QMainWindow {
     Q_OBJECT
 public:
-    MainWindow(ConferenceSimulation *sim);
+    explicit MainWindow(ConferenceSimulation *sim);
     ~MainWindow();
+
 private:
     void setupScene();
     void setupButton();
+
 public slots:
-    // Тот самый слот, который будет двигать кружочки
     void onInteraction(int id1, int id2, bool isMatch);
 
 private:
     ConferenceSimulation* m_sim;
     QGraphicsScene *scene;
     QGraphicsView *view;
-    std::map<int, QGraphicsEllipseItem*> items; // Быстрый доступ к кружку по ID
+    std::map<int, QGraphicsEllipseItem*> items;
+
     QLineEdit *idInput;
     QPushButton *findButton;
     QPushButton *logButton;
     QPushButton *finalReportButton;
 };
+
+#endif // MAINWINDOW_H
+

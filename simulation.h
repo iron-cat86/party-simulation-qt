@@ -2,66 +2,74 @@
 #define SIMULATION_H
 
 #include <QObject>
-#include <QTimer>
-#include <QThread>
 #include <QString>
-#include <QDateTime>
-#include <QDebug>
-#include <QMutex>
-#include <QMutexLocker>
+#include <QVector> // В Qt лучше использовать QVector или std::vector
 #include <vector>
 #include <random>
-#include <chrono>
-#include <iomanip>
-static std::atomic<bool> isRun{false};
-enum class Interest { EPIDEMIOLOGY, STATISTICS, CLINICAL_TRIALS, HEALTH_POLICY };
+#include <QMutex>
+#include <QMutexLocker>
+#include <QDebug>
+#include <QDateTime>
 
-struct Person 
+enum class Interest
 {
+    EPIDEMIOLOGY,
+    STATISTICS,
+    CLINICAL_TRIALS,
+    HEALTH_POLICY
+};
+
+struct Person {
     int id;
     Interest interest;
     QString room = "A";
 
     QString getInterestStr() const {
-        static const QString names[] =
-        {"эпидемиология", "статистика", "клинические исследования", "политика в области здравоохранения"};
-        //"Epidemiology", "Statistics", "Clinical Trials", "Health Policy" };
+        static const QString names[] = { "Эпидемиология",
+                                         "Статистика",
+                                         "Клинические исследования",
+                                         "Политика здравоохранения"  };
         return names[static_cast<int>(interest)];
     }
 };
 
-class ConferenceSimulation: public QThread 
-{
+class ConferenceSimulation : public QObject {
     Q_OBJECT
 public:
     explicit ConferenceSimulation(int n, int intervalMs);
     ~ConferenceSimulation();
 
+    // Геттеры для UI
     const std::vector<Person>& getRoomA() const { return roomA; }
     const std::vector<Person>& getRoomB() const { return roomB; }
-    void stop();
     QString findPersonById(int id) const;
+    QString getHistoryLog() const;
     QString getFinalStateReport() const;
-    const QString getHistoryLog() const {return logString;}
-private:
-    void printState(QString log) const;
-    void display(const Person& p) const;
-    void buildLogString(QString curLog);
-    QString getCurrentTimestamp() const;
-protected:
-    void run() override;
+
 public slots:
-    void nextStep();
+    void process();
+    void stop();
+
 signals:
     void interactionOccurred(int id1, int id2, bool isMatch);
     void simulationEnded();
+    void finished(); // Сигнал для завершения потока в main.cpp
 
 private:
-    mutable QMutex dataMutex;
-    int m_interval;
+    void nextStep();
+    void buildLogString(QString curLog);
+    void display(const Person& p) const;
+    QString getCurrentTimestamp() const;
+
     std::vector<Person> roomA;
     std::vector<Person> roomB;
+
     std::mt19937 gen{std::random_device{}()};
+    int m_interval;
+    std::atomic<bool> isRun; // Атомарный флаг для безопасности
     QString logString;
+    mutable QMutex dataMutex;
 };
-#endif
+
+#endif // SIMULATION_H
+
