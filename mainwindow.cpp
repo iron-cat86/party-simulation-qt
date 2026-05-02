@@ -38,6 +38,7 @@ void MainWindow::setHelpMenu()
     helpMenu = menuBar()->addMenu("Help");
 
     aboutAction = new QAction("About Application", this);
+    aboutAction->setObjectName("aboutAction");
     helpMenu->addAction(aboutAction);
 
     connect(aboutAction, &QAction::triggered, [this]() {
