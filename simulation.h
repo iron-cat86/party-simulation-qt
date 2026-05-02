@@ -36,6 +36,9 @@ struct Person {
 
 class ConferenceSimulation : public QObject {
     Q_OBJECT
+    friend class SimulationLogic_NextStepInteraction_Test;
+    friend class SimulationLogic_LogGeneration_Test;
+    friend class SimulationLogic_StopCommand_Test;
 public:
     explicit ConferenceSimulation(int n, int intervalMs);
     ~ConferenceSimulation();
@@ -43,6 +46,7 @@ public:
     // Геттеры для UI
     const std::vector<Person>& getRoomA() const { return roomA; }
     const std::vector<Person>& getRoomB() const { return roomB; }
+    bool isRunning() const { return isRun; }
     QString findPersonById(int id) const;
     QString getHistoryLog() const;
     QString getFinalStateReport() const;

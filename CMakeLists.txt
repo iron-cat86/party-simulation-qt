@@ -42,3 +42,11 @@ add_executable(AppTests
 )
 target_link_libraries(AppTests GTest::gtest_main Qt5::Core Qt5::Widgets Qt5::Gui)
 
+add_executable(SimulationTests
+    tests/simulation_tests.cpp
+    app.cpp
+    app.h
+    simulation.cpp
+    simulation.h
+)
+target_link_libraries(SimulationTests GTest::gtest_main Qt5::Core Qt5::Widgets Qt5::Gui)
