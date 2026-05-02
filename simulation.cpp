@@ -119,18 +119,23 @@ QString ConferenceSimulation::findPersonById(int id) const
 {
     QMutexLocker locker(&dataMutex);
 
-    for (const auto& p : roomA)
-    {
-        if (p.id == id)
-            return QString("ID: %1\nИнтерес: %2\nЛокация: Зал А").arg(p.id).arg(p.getInterestStr());
+    auto itA = std::find_if(roomA.begin(), roomA.end(), [id](const Person& p) {
+        return p.id == id;
+    });
+
+    if (itA != roomA.end()) {
+        return QString("ID: %1\nИнтерес: %2\nЛокация: Зал А")
+                   .arg(itA->id).arg(itA->getInterestStr());
     }
 
-    for (const auto& p : roomB)
-    {
-        if (p.id == id)
-            return QString("ID: %1\nИнтерес: %2\nЛокация: Зал Б").arg(p.id).arg(p.getInterestStr());
-    }
+    auto itB = std::find_if(roomB.begin(), roomB.end(), [id](const Person& p) {
+        return p.id == id;
+    });
 
+    if (itB != roomB.end()) {
+        return QString("ID: %1\nИнтерес: %2\nЛокация: Зал Б")
+                   .arg(itB->id).arg(itB->getInterestStr());
+    }
     return "Участник не найден";
 }
 
