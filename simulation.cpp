@@ -171,7 +171,7 @@ QString ConferenceSimulation::getFinalStateReport() const
 
     QString report = "===== ИТОГОВЫЙ ОТЧЕТ =====\n\n";
     report += QString("ЗАЛ А (Остались): %1 чел.\n").arg(roomA.size()) + countInterests(roomA);
-    report += QString("\nЗАЛ Б (Пары): %1\n").arg(roomB.size() / 2) + countInterests(roomB);
+    report += QString("\nЗАЛ Б (всего людей): %1 чел. (Пары): %2\n").arg(roomB.size()).arg(roomB.size() / 2) + countInterests(roomB);
     report += QString("Всего итераций %1\n").arg(iterationCount);
     return report;
 }
