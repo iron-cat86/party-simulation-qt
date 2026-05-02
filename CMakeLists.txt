@@ -50,3 +50,19 @@ add_executable(SimulationTests
     simulation.h
 )
 target_link_libraries(SimulationTests GTest::gtest_main Qt5::Core Qt5::Widgets Qt5::Gui)
+
+add_executable(MainWindowTests
+    tests/mainwindow_tests.cpp
+    app.cpp
+    app.h
+    simulation.cpp
+    simulation.h
+    mainwindow.cpp
+    mainwindow.h
+    simulationwidget.cpp
+    simulationwidget.h
+    app.cpp
+    app.h
+    ${RESOURCES}
+)
+target_link_libraries(MainWindowTests GTest::gtest_main Qt5::Core Qt5::Widgets Qt5::Gui)
