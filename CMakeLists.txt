@@ -29,3 +29,14 @@ add_executable(PartySimulationUI
 
 target_link_libraries(PartySimulationUI PRIVATE Qt5::Widgets Qt5::Gui)
 
+find_package(GTest REQUIRED)
+
+add_executable(AppTests
+    tests/app_tests.cpp
+    app.cpp
+    app.h
+    qrc_app.cpp
+    ${PartySimulationUI_RESOURCES}
+)
+target_link_libraries(AppTests GTest::gtest_main Qt5::Core Qt5::Widgets Qt5::Gui)
+
