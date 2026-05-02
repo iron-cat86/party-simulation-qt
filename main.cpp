@@ -10,8 +10,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    QIcon icon = App::UI::makeIcon(":/icon.png");
-    a.setWindowIcon(icon);
+    a.setWindowIcon(App::UI::makeIcon(":/icon.png"));
 
     QSplashScreen *splash = App::UI::makeSplashScreen(":/splash.png");
 
