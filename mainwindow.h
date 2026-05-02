@@ -9,6 +9,7 @@
 #include <QPushButton>
 #include <map>
 #include "simulation.h"
+#include "simulationwidget.h"
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -17,16 +18,10 @@ public:
     ~MainWindow();
 
 private:
-    void setupScene();
-    void setupButton();
-
-public slots:
-    void onInteraction(int id1, int id2, bool isMatch);
+    void setupButtons();
 
 private:
     ConferenceSimulation* m_sim;
-    QGraphicsScene *scene;
-    QGraphicsView *view;
     std::map<int, QGraphicsEllipseItem*> items;
 
     QLineEdit *idInput;
@@ -36,6 +31,7 @@ private:
 
     QMenu *helpMenu;
     QAction *aboutAction;
+    SimulationWidget *simWidget;
 };
 
 #endif // MAINWINDOW_H

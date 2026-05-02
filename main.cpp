@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
     }
 
     QThread* simThread = new QThread();
-    ConferenceSimulation *sim = new ConferenceSimulation(20, 1000);
+    ConferenceSimulation *sim = new ConferenceSimulation(201, 1000);
     sim->moveToThread(simThread);
 
     QObject::connect(simThread, &QThread::started, sim, &ConferenceSimulation::process);
