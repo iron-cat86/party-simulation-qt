@@ -7,6 +7,7 @@
 #include <QGraphicsEllipseItem>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QHBoxLayout>
 #include <map>
 #include "simulation.h"
 #include "simulationwidget.h"
@@ -22,11 +23,16 @@ private:
     void setHelpMenu();
     void setGraphics();
     void setConnects();
+    void setFindEdit();
+    void setFindButton();
+    void setLogButton();
+    void setFinalReportButton();
 
 private:
     ConferenceSimulation* m_sim;
     std::map<int, QGraphicsEllipseItem*> items;
 
+    QHBoxLayout *hLayout;
     QLineEdit *idInput;
     QPushButton *findButton;
     QPushButton *logButton;

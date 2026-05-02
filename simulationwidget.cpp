@@ -9,10 +9,6 @@ SimulationWidget::SimulationWidget(ConferenceSimulation *sim, QWidget *parent)
 {
     m_scene = new QGraphicsScene(this);
     setScene(m_scene);
-
-    view = new QGraphicsView(this);
-    view->setScene(m_scene);
-
     setupScene();
 }
 

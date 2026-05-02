@@ -18,7 +18,6 @@ private:
     void setupScene();
     ConferenceSimulation *m_sim;
     QGraphicsScene *m_scene;
-    QGraphicsView *view;
     std::map<int, QGraphicsEllipseItem*> items;
 };
 

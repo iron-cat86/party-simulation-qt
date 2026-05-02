@@ -17,6 +17,7 @@
 MainWindow::MainWindow(ConferenceSimulation *sim)
     : m_sim(sim)
 {
+    resize(800, 650);
     setHelpMenu();
     setGraphics();
     setupButtons();
@@ -81,28 +82,40 @@ void MainWindow::setGraphics()
     QWidget *central = new QWidget(this);
     central->setLayout(mainLayout);
     setCentralWidget(central);
-    resize(800, 600);
 }
 
 void MainWindow::setupButtons()
 {
     QWidget *controls = new QWidget(this);
-    QHBoxLayout *hLayout = new QHBoxLayout(controls);
+    hLayout = new QHBoxLayout(controls);
 
+    setFindEdit();
+    setFindButton();
+    setLogButton();
+    setFinalReportButton();
+
+    hLayout->addStretch();
+
+    QVBoxLayout *mainLayout = new QVBoxLayout();
+    mainLayout->addWidget(controls);
+    mainLayout->addWidget(simWidget);
+
+    QWidget *central = new QWidget(this);
+    central->setLayout(mainLayout);
+    setCentralWidget(central);
+}
+
+void MainWindow::setFindEdit()
+{
     idInput = new QLineEdit(this);
     idInput->setPlaceholderText("Введите ID...");
     idInput->setFixedWidth(100);
-
-    findButton = new QPushButton("Найти участника", this);
-    logButton = new QPushButton("Лог событий", this);
-    finalReportButton = new QPushButton("Итоговый отчет", this);
-
     hLayout->addWidget(idInput);
-    hLayout->addWidget(findButton);
-    hLayout->addWidget(logButton);
-    hLayout->addWidget(finalReportButton);
-    hLayout->addStretch();
+}
 
+void MainWindow::setFindButton()
+{
+    findButton = new QPushButton("Найти участника", this);
     connect(findButton, &QPushButton::clicked, this, [this]() {
         bool ok;
         int id = idInput->text().toInt(&ok);
@@ -114,7 +127,12 @@ void MainWindow::setupButtons()
         QString info = m_sim->findPersonById(id);
         QMessageBox::information(this, "Результат поиска", info);
     });
+    hLayout->addWidget(findButton);
+}
 
+void MainWindow::setLogButton()
+{
+    logButton = new QPushButton("Лог событий", this);
     connect(logButton, &QPushButton::clicked, this, [this]() {
         QDialog *logDialog = new QDialog(this);
         logDialog->setWindowTitle("ЖУРНАЛ СОБЫТИЙ");
@@ -132,17 +150,15 @@ void MainWindow::setupButtons()
         l->addWidget(closeBtn);
         logDialog->exec();
     });
+    hLayout->addWidget(logButton);
+}
 
+void MainWindow::setFinalReportButton()
+{
+    finalReportButton = new QPushButton("Итоговый отчет", this);
     connect(finalReportButton, &QPushButton::clicked, this, [this]() {
         QString finalReport = m_sim->getFinalStateReport();
         QMessageBox::information(this, "Итоги", finalReport);
     });
-
-    QVBoxLayout *mainLayout = new QVBoxLayout();
-    mainLayout->addWidget(controls);
-    mainLayout->addWidget(simWidget);
-
-    QWidget *central = new QWidget(this);
-    central->setLayout(mainLayout);
-    setCentralWidget(central);
+    hLayout->addWidget(finalReportButton);
 }
