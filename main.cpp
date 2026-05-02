@@ -4,23 +4,13 @@
 #include "mainwindow.h"
 #include "simulation.h"
 
-int main(int argc, char *argv[])
+QIcon makeIcon(QString iconPath)
 {
-    QApplication a(argc, argv);
-    QString iconPath = ":/icon.png";
-    QString imagePath = ":/splash.png";
-    QPixmap pixmap(imagePath);
-
-    if (pixmap.isNull())
-    {
-        qDebug() << "ERROR: Failed to load splash image!";
-    }
-
     QPixmap originalPixmap(iconPath);
 
     if (originalPixmap.isNull())
     {
-        qDebug() << "ERROR: Failed to load original image!";
+        qDebug() << "ERROR: Failed to load original image for icon!";
     }
 
     QPixmap scaledIcon = originalPixmap.scaled(
@@ -35,8 +25,17 @@ int main(int argc, char *argv[])
     {
         qDebug()<<"ERROR: Fauld to load icon!";
     }
+    return icon;
+}
 
-    a.setWindowIcon(icon);
+QSplashScreen* makeSplashScreen(QString imagePath)
+{
+    QPixmap pixmap(imagePath);
+
+    if (pixmap.isNull())
+    {
+        qDebug() << "ERROR: Failed to load splash image!";
+    }
 
     int desiredWidth = 800;
     int desiredHeight = 800;
@@ -47,11 +46,22 @@ int main(int argc, char *argv[])
         Qt::KeepAspectRatio,
         Qt::SmoothTransformation
     );
+    QSplashScreen *splash = new QSplashScreen(scaledPixmap);
+    splash->show();
+    splash->repaint();
+    splash->raise();
+    return splash;
+}
 
-    QSplashScreen splash(scaledPixmap);
-    splash.show();
-    splash.repaint();
-    splash.raise();
+int main(int argc, char *argv[])
+{
+    QApplication a(argc, argv);
+
+    QIcon icon = makeIcon(":/icon.png");
+    a.setWindowIcon(icon);
+
+    QSplashScreen *splash = makeSplashScreen(":/splash.png");
+
     a.processEvents();
     QTime dieTime = QTime::currentTime().addSecs(2);
 
@@ -61,7 +71,7 @@ int main(int argc, char *argv[])
     }
 
     QThread* simThread = new QThread();
-    ConferenceSimulation *sim = new ConferenceSimulation(201, 1000);
+    ConferenceSimulation *sim = new ConferenceSimulation(5, 1000);
     sim->moveToThread(simThread);
 
     QObject::connect(simThread, &QThread::started, sim, &ConferenceSimulation::process);
@@ -71,7 +81,7 @@ int main(int argc, char *argv[])
     MainWindow w(sim);
     w.setWindowTitle("Conference Party");
     w.show();
-    splash.finish(&w);
+    splash->finish(&w);
 
     simThread->start();
 
