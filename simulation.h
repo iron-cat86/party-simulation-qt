@@ -10,6 +10,7 @@
 #include <QMutexLocker>
 #include <QDebug>
 #include <QDateTime>
+#include "app.h"
 
 enum class Interest
 {
@@ -59,7 +60,6 @@ private:
     void nextStep();
     void buildLogString(QString curLog);
     void display(const Person& p) const;
-    QString getCurrentTimestamp() const;
 
     std::vector<Person> roomA;
     std::vector<Person> roomB;

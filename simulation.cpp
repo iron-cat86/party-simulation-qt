@@ -144,14 +144,9 @@ void ConferenceSimulation::display(const Person& p) const
    qDebug().noquote() << "ID:" << p.id << "| Interest:" << p.getInterestStr() << "| Room:" << p.room;
 }
 
-QString ConferenceSimulation::getCurrentTimestamp() const
-{
-    return QDateTime::currentDateTime().toString("HH:mm:ss");
-}
-
 void ConferenceSimulation::buildLogString(QString curLog)
 {
-    logString += getCurrentTimestamp() + ": " + curLog;
+    logString += App::Data::getCurrentTimestamp() + ": " + curLog;
 }
 
 QString ConferenceSimulation::getHistoryLog() const

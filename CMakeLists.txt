@@ -21,6 +21,8 @@ add_executable(PartySimulationUI
     simulation.h
     simulationwidget.cpp
     simulationwidget.h
+    app.cpp
+    app.h
     qrc_app.cpp
     ${PartySimulationUI_RESOURCES}
 )
