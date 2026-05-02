@@ -96,7 +96,7 @@ The application is cross-platform but requires the following environment-specifi
    ```
 4. Run the executable:
    ```bash
-   ./PartySimulationUI
+   ./PartySimulationUI [participants_count]
    ```
 ## Quality Assurance & Testing
 The project is built with a "Test-Driven" mindset, featuring a comprehensive test suite powered by **Google Test (GTest)**. The testing architecture covers all application layers:

@@ -8,6 +8,23 @@
 
 int main(int argc, char *argv[])
 {
+    int nParticipants = 20; // Значение по умолчанию
+
+    if (argc > 1)
+    {
+        bool ok;
+        int val = QString(argv[1]).toInt(&ok);
+
+        if (ok && val > 1) // Минимум 2 человека для общения
+        {
+            nParticipants = val;
+        }
+        else
+        {
+            qDebug() << "Warning: Invalid N provided. Using default (20).";
+        }
+    }
+
     QApplication a(argc, argv);
 
     a.setWindowIcon(App::UI::makeIcon(":/icon.png"));
@@ -23,7 +40,7 @@ int main(int argc, char *argv[])
     }
 
     QThread* simThread = new QThread();
-    ConferenceSimulation *sim = new ConferenceSimulation(5, 1000);
+    ConferenceSimulation *sim = new ConferenceSimulation(nParticipants, 1000);
     sim->moveToThread(simThread);
     QObject::connect(simThread, &QThread::started, sim, &ConferenceSimulation::process);
     QObject::connect(sim, &ConferenceSimulation::simulationEnded, simThread, &QThread::quit);
