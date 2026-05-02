@@ -35,6 +35,8 @@ add_executable(AppTests
     tests/app_tests.cpp
     app.cpp
     app.h
+    simulation.cpp
+    simulation.h
     qrc_app.cpp
     ${PartySimulationUI_RESOURCES}
 )

@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 #include <QApplication>
+#include <QThread>
+#include "../simulation.h"
 #include "../app.h"
 
 class AppTest : public ::testing::Test {
@@ -35,4 +37,27 @@ TEST_F(AppTest, TimestampFormat)
     ts.left(2).toInt(&ok);
     EXPECT_TRUE(ok);
 }
+
+TEST_F(AppTest, SimulationThreadIntegration)
+{
+    QThread* simThread = new QThread();
+    ConferenceSimulation *sim = new ConferenceSimulation(2, 100);
+    sim->moveToThread(simThread);
+
+    QObject::connect(simThread, &QThread::started, sim, &ConferenceSimulation::process);
+
+    simThread->start();
+
+    EXPECT_TRUE(simThread->isRunning());
+
+    sim->stop();
+    simThread->quit();
+    simThread->wait();
+
+    delete sim;
+    delete simThread;
+}
+
+
+
 
