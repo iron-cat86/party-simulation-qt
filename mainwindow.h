@@ -19,6 +19,9 @@ public:
 
 private:
     void setupButtons();
+    void setHelpMenu();
+    void setGraphics();
+    void setConnects();
 
 private:
     ConferenceSimulation* m_sim;

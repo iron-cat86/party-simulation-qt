@@ -17,12 +17,23 @@
 MainWindow::MainWindow(ConferenceSimulation *sim)
     : m_sim(sim)
 {
-    resize(800, 600);
+    setHelpMenu();
+    setGraphics();
+    setupButtons();
+    setConnects();
+}
 
-    connect(m_sim, &ConferenceSimulation::simulationEnded, this, [this]() {
-        QMessageBox::information(this, "Конец симуляции", "Подходящих пар в зале А больше нет!");
-    });
+MainWindow::~MainWindow()
+{
+    if (m_sim)
+    {
+        m_sim->stop();
+        delete m_sim;
+    }
+}
 
+void MainWindow::setHelpMenu()
+{
     helpMenu = menuBar()->addMenu("Help");
 
     aboutAction = new QAction("About Application", this);
@@ -31,8 +42,6 @@ MainWindow::MainWindow(ConferenceSimulation *sim)
     connect(aboutAction, &QAction::triggered, [this]() {
         QMessageBox aboutBox(this);
         aboutBox.setWindowTitle("О программе");
-
-        // Тот самый текст "кто, нахуя и как с этим жить"
         QString info = "<b>Conference Party Simulator</b><br><br>"
                        "<b>Автор:</b> Анна Белова (Lead Systems Programmer)<br>"
                        "<b>Назначение:</b> Моделирование социальных взаимодействий на базе Qt/C++.<br><br>"
@@ -48,30 +57,31 @@ MainWindow::MainWindow(ConferenceSimulation *sim)
 
         aboutBox.exec();
     });
-    simWidget = new SimulationWidget(m_sim, this);
+}
 
+void MainWindow::setConnects()
+{
+    connect(m_sim, &ConferenceSimulation::simulationEnded, this, [this]() {
+        QMessageBox::information(this, "Конец симуляции", "Подходящих пар в зале А больше нет!");
+    });
     connect(m_sim, &ConferenceSimulation::interactionOccurred,
                 simWidget, &SimulationWidget::onInteraction);
+    connect(m_sim, &ConferenceSimulation::interactionOccurred,
+            simWidget, &SimulationWidget::onInteraction);
+}
+
+void MainWindow::setGraphics()
+{
+    simWidget = new SimulationWidget(m_sim, this);
     QVBoxLayout *mainLayout = new QVBoxLayout();
     QWidget *controls = new QWidget(this);
     mainLayout->addWidget(controls);
-    mainLayout->addWidget(simWidget); // Добавляем наш новый класс!
+    mainLayout->addWidget(simWidget);
 
     QWidget *central = new QWidget(this);
     central->setLayout(mainLayout);
     setCentralWidget(central);
-    connect(m_sim, &ConferenceSimulation::interactionOccurred,
-            simWidget, &SimulationWidget::onInteraction);
-    setupButtons();
-}
-
-MainWindow::~MainWindow()
-{
-    if (m_sim)
-    {
-        m_sim->stop();
-        delete m_sim;
-    }
+    resize(800, 600);
 }
 
 void MainWindow::setupButtons()
