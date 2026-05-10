@@ -39,17 +39,22 @@ int main(int argc, char *argv[])
         a.processEvents(QEventLoop::AllEvents, 100);
     }
 
-    QThread* simThread = new QThread();
     ConferenceSimulation *sim = new ConferenceSimulation(nParticipants, 1000);
-    sim->moveToThread(simThread);
-    QObject::connect(simThread, &QThread::started, sim, &ConferenceSimulation::process);
-    QObject::connect(sim, &ConferenceSimulation::simulationEnded, simThread, &QThread::quit);
 
-    MainWindow w(sim);
+        // 2. Создаем окно и передаем туда симуляцию
+        MainWindow w(sim);
+        w.setWindowTitle(QString("Multi-threaded Party (%1 Participants)").arg(nParticipants));
+        w.show();
+
+        // Закрываем сплэш (если он есть в твоем коде выше)
+
+        // 3. Прямо запускаем процесс.
+        // Внутри sim->process() теперь вызывается QtConcurrent::run для каждого участника.
+        sim->process();
     w.setWindowTitle("Conference Party");
     w.show();
     splash->finish(&w);
-    simThread->start();
+    //simThread->start();
 
     return a.exec();
 }

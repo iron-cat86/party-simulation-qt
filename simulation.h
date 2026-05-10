@@ -32,6 +32,8 @@ struct Person {
                                          "Политика здравоохранения"  };
         return names[static_cast<int>(interest)];
     }
+    QMutex mutex;
+    bool isBusy = false;
 };
 
 class ConferenceSimulation : public QObject {
@@ -44,8 +46,8 @@ public:
     ~ConferenceSimulation();
 
     // Геттеры для UI
-    const std::vector<Person>& getRoomA() const { return roomA; }
-    const std::vector<Person>& getRoomB() const { return roomB; }
+    const std::vector<Person*>& getRoomA() const { return roomA; }
+    const std::vector<Person*>& getRoomB() const { return roomB; }
     bool isRunning() const { return isRun; }
     QString findPersonById(int id) const;
     QString getHistoryLog() const;
@@ -61,17 +63,19 @@ signals:
     void finished(); // Сигнал для завершения потока в main.cpp
 
 private:
-    void nextStep();
+    void checkOnFinish();
     void buildLogString(QString curLog);
-    void display(const Person& p) const;
+    void display(const Person* p) const;
+    void participantLifeCycle(Person* self);
 
-    std::vector<Person> roomA;
-    std::vector<Person> roomB;
+    std::vector<Person*> roomA;
+    std::vector<Person*> roomB;
 
     std::mt19937 gen{std::random_device{}()};
     int m_interval;
     int iterationCount = 0;
     std::atomic<bool> isRun; // Атомарный флаг для безопасности
+    //std::atomic<bool> wasEndedSignalSent{false};
     QString logString;
     mutable QMutex dataMutex;
 };

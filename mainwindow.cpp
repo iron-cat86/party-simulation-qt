@@ -12,6 +12,7 @@
 #include <QDialog>
 #include <QDebug>
 #include <QMenuBar>
+#include <QTimer>
 #include <random>
 
 MainWindow::MainWindow(ConferenceSimulation *sim)
@@ -64,12 +65,11 @@ void MainWindow::setHelpMenu()
 void MainWindow::setConnects()
 {
     connect(m_sim, &ConferenceSimulation::simulationEnded, this, [this]() {
-        QMessageBox::information(this, "Конец симуляции", "Подходящих пар в зале А больше нет!");
-    });
+            QMessageBox::information(this, "Конец симуляции", "Подходящих пар в зале А больше нет!");
+    }, Qt::QueuedConnection);
+
     connect(m_sim, &ConferenceSimulation::interactionOccurred,
-                simWidget, &SimulationWidget::onInteraction);
-    connect(m_sim, &ConferenceSimulation::interactionOccurred,
-            simWidget, &SimulationWidget::onInteraction);
+            simWidget, &SimulationWidget::onInteraction, Qt::QueuedConnection);
 }
 
 void MainWindow::setGraphics()
