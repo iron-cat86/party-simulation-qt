@@ -2,20 +2,19 @@
 Qt-based cocktail party simulation using C++
 
 ## Overview
-The application models a "cocktail party" scenario where participants with different scientific interests (Epidemiology, Statistics, Clinical Trials, Health Policy) interact in real-time. When two participants with matching interests meet, they form a pair and move to a separate lounge area.
-
+This application models a "cocktail party" scenario at a scientific conference. The simulation populates Room A with N participants, each assigned a unique ID and one of four scientific interests.Unlike standard linear simulations, this version implements a highly parallel architecture where every participant operates as an independent agent (thread), searching for matches in real-time. When interests align, pairs move to a separate Lounge (Room B).
 ## Key Features
-*   **Event-Driven Logic:** Utilizes Qt's signal-broadcast system for decoupled interaction between simulation logic and UI.
-*   **Real-time Visualization:** Dynamic 2D rendering using `QGraphicsScene` with smooth animations for participant movements.
-*   **Robust Randomization:** Implements the **Mersenne Twister (mt19937)** engine for high-quality statistical distribution of interests and interactions.
-*   **Thread-Safe Architecture:** Core logic is encapsulated to ensure stability and maintainability.
-*   **Interactive Search:** Built-in tool to track any participant's status and location by their unique ID.
-*   **Comprehensive Testing:** Integrated **Google Test (GTest)** suite covering core logic, UI component assembly, and asynchronous graphics behavior.
+*   **High-Concurrency Engine:** Powered by QtConcurrent and QThreadPool. The system dynamically scales to handle thousands of independent threads, simulating massive interaction density.
+*   **Thread-Safe Architecture:** Implements advanced synchronization primitives (QMutexLocker, std::atomic, and pointer-sorting to prevent Deadlocks) for rock-solid stability under extreme load.
+*   **Real-time Visualization:** High-performance 2D rendering using QGraphicsScene with adaptive animations. Includes a "State Reconciliation" layer to ensure UI accuracy at 1000+ threads.
+*   **Robust Randomization:** Uses the Mersenne Twister (mt19937) engine for high-quality statistical distribution of participant interests and encounter logic.
+*   **Interactive Analytics:** Real-time event logging, participant tracking by ID, and comprehensive state reporting available at any moment during the simulation.
 
 ## Technical Stack
 *   **Language:** C++17
-*   **Framework:** Qt 5.12+ (Widgets, Gui, Core)
+*   **Framework:** Qt 5.12+ (Widgets, Gui, Core, Concurrent)
 *   **Build System:** CMake 3.14+
+*   **Concurrency:** Multi-threaded worker-object pattern with global thread pool management.
 *   **Documentation:** Fully documented architecture ready for technical review.
 ## Prerequisites (Setting up the environment ubuntu 24)
 If you are using a fresh Linux installation (Ubuntu/Debian), run the following commands to install all necessary dependencies (Qt5, CMake, and Google Test):
@@ -25,7 +24,7 @@ If you are using a fresh Linux installation (Ubuntu/Debian), run the following c
 sudo apt-get update
 
 # Install build tools and Qt5
-sudo apt-get install build-essential cmake qt5-default qtbase5-dev libqt5widgets5 libqt5gui5 libqt5core5a
+sudo apt-get install build-essential cmake qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools libqt5widgets5 libqt5gui5 libqt5core5a
 
 # Install Google Test (GTest)
 sudo apt-get install libgtest-dev
