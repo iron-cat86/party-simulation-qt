@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include  <QCoreApplication>
 #include "../simulation.h"
 
 // 1. Тест конструктора и инициализации
@@ -25,13 +26,21 @@ TEST(SimulationLogic, SearchFunctionality)
     EXPECT_EQ(notFound, "Участник не найден");
 }
 
-// 3. Тест одного шага симуляции (nextStep)
+// 3. Тест одного шага симуляции
 TEST(SimulationLogic, NextStepInteraction)
 {
     // Создаем всего 2 человека
     ConferenceSimulation sim(2, 100);
-    // Делаем один шаг вручную
-    //sim.nextStep();
+    sim.process();
+
+    QTime dieTime = QTime::currentTime().addMSecs(200);
+
+    while (QTime::currentTime() < dieTime)
+    {
+        QCoreApplication::processEvents(); // Чтобы сигналы и таймеры обрабатывались
+    }
+
+    sim.stop();
     // Проверяем, что если пара совпала, зал А опустел, а зал Б наполнился
     // Либо они остались в зале А, если интересы разные.
     size_t total = sim.getRoomA().size() + sim.getRoomB().size();
@@ -41,14 +50,24 @@ TEST(SimulationLogic, NextStepInteraction)
 // 4. Тест логирования (buildLogString)
 TEST(SimulationLogic, LogGeneration)
 {
-    ConferenceSimulation sim(10, 100);
-    //sim.nextStep();
-    
+    ConferenceSimulation sim(10, 10);
+    sim.process();
+
+    QTime dieTime = QTime::currentTime().addMSecs(200);
+
+    while (QTime::currentTime() < dieTime)
+    {
+        QCoreApplication::processEvents(); // Чтобы сигналы и таймеры обрабатывались
+    }
+
+    sim.stop();
     QString log = sim.getHistoryLog();
+
     EXPECT_FALSE(log.isEmpty());
     EXPECT_NE(log, "Лог пуст");
-    // Проверяем, что в логе есть временная метка (формат HH:mm:ss содержит двоеточия)
+
     EXPECT_TRUE(log.contains(":"));
+    EXPECT_TRUE(log.contains("Участник") || log.contains("встреча"));
 }
 
 // 5. Тест итогового отчета (getFinalStateReport)
@@ -71,6 +90,15 @@ TEST(SimulationLogic, StopCommand)
     sim.stop(); 
     EXPECT_FALSE(sim.isRunning());
     ConferenceSimulation simSmall(1, 100); // Всего 1 человек
-    //simSmall.nextStep(); // Тут внутри должен сработать isRun = false
+    sim.process();
+
+    QTime dieTime = QTime::currentTime().addMSecs(200);
+
+    while (QTime::currentTime() < dieTime)
+    {
+        QCoreApplication::processEvents(); // Чтобы сигналы и таймеры обрабатывались
+    }
+
+    sim.stop();
     EXPECT_FALSE(simSmall.isRunning());
 }
