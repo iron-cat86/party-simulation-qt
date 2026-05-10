@@ -70,6 +70,24 @@ void MainWindow::setConnects()
 
     connect(m_sim, &ConferenceSimulation::interactionOccurred,
             simWidget, &SimulationWidget::onInteraction, Qt::QueuedConnection);
+    connect(m_sim, &ConferenceSimulation::simulationEnded, this, [this]() {
+        QTimer::singleShot(500, this, [this]() {
+            for (Person* p : m_sim->getRoomA())
+            {
+                 if (p->room == "B")
+                 {
+                     simWidget->forceMoveToB(p->id);
+                 }
+            }
+
+            for (Person* p : m_sim->getRoomB())
+            {
+                 simWidget->forceMoveToB(p->id);
+            }
+
+            QMessageBox::information(this, "Итог", "Симуляция завершена. Графика синхронизирована!");
+        });
+    });
 }
 
 void MainWindow::setGraphics()

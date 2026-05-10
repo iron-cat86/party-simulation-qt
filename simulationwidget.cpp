@@ -99,3 +99,13 @@ void SimulationWidget::onInteraction(int id1, int id2, bool isMatch)
 
     anim->start(QAbstractAnimation::DeleteWhenStopped);
 }
+
+void SimulationWidget::forceMoveToB(int id) {
+    auto* item = items[id];
+    if (item && item->data(0) != "in_b") {
+        item->setData(0, "in_b");
+        std::mt19937 gen(std::random_device{}());
+        item->setPos(410 + (gen() % 280), 50 + (gen() % 400));
+        item->setPen(QPen(Qt::magenta, 3));
+    }
+}

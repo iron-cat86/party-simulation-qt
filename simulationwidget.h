@@ -10,6 +10,7 @@ class SimulationWidget : public QGraphicsView {
     Q_OBJECT
 public:
     explicit SimulationWidget(ConferenceSimulation *sim, QWidget *parent = nullptr);
+    void forceMoveToB(int id);
 
 public slots:
     void onInteraction(int id1, int id2, bool isMatch);
